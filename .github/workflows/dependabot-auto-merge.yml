@@ -1,0 +1,72 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+          
+      - name: Run tests
+        run: ./mvnw clean test
+        
+      - name: Build project
+        run: ./mvnw clean compile
+        
+  auto-merge:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check if PR is ready for merge
+        id: check-pr
+        run: |
+          # Check if PR is in a mergeable state
+          PR_STATE=$(gh pr view ${{ github.event.pull_request.number }} --json mergeable --jq '.mergeable')
+          if [ "$PR_STATE" != "MERGEABLE" ]; then
+            echo "PR is not in a mergeable state: $PR_STATE"
+            exit 1
+          fi
+          echo "PR is ready for merge"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Approve Dependabot PR
+        run: |
+          gh pr review ${{ github.event.pull_request.number }} --approve --body "Auto-approving Dependabot PR after successful tests"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Enable auto-merge for Dependabot PRs
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --auto --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
