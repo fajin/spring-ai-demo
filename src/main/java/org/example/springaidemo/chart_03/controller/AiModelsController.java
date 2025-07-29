@@ -20,4 +20,10 @@ public class AiModelsController {
         System.out.println(content);
         return content;
     }
+
+    public void process(String input) {
+        if (input.equals("test")) {
+            System.out.println("Valid");
+        }
+    }
 }

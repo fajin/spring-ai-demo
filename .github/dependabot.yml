@@ -1,0 +1,50 @@
+version: 2
+updates:
+  # Enable version updates for Maven
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "fajin"
+    assignees:
+      - "fajin"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Group minor and patch updates together
+    groups:
+      spring-dependencies:
+        patterns:
+          - "org.springframework*"
+          - "org.springframework.ai*"
+          - "org.springframework.boot*"
+          - "org.springframework.cloud*"
+      database-dependencies:
+        patterns:
+          - "com.mysql*"
+          - "com.baomidou*"
+          - "org.mybatis*"
+          - "com.alibaba*"
+      test-dependencies:
+        patterns:
+          - "*junit*"
+          - "*mockito*"
+          - "*testcontainers*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Allow both direct and indirect updates
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    # Ignore major version updates for critical dependencies
+    ignore:
+      - dependency-name: "org.springframework.boot*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "com.mysql*"
+        update-types: ["version-update:semver-major"]
