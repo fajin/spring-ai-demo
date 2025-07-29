@@ -22,7 +22,7 @@ public class AiModelsController {
     }
 
     public void process(String input) {
-        if (input.equals("test")) { // 未判空直接调用方法
+        if (input.equals("test")) {
             System.out.println("Valid");
         }
     }
