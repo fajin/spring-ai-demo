@@ -20,4 +20,10 @@ public class AiModelsController {
         System.out.println(content);
         return content;
     }
+
+    public void process(String input) {
+        if (input.equals("test")) { // 未判空直接调用方法
+            System.out.println("Valid");
+        }
+    }
 }
