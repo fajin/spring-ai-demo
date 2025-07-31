@@ -1,6 +1,7 @@
 package org.example.springaidemo.chart_03.controller;
 
 
+import java.io.FileReader;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +20,27 @@ public class AiModelsController {
         String content = chatClient.prompt().user("你是谁？").call().content();
         System.out.println(content);
         return content;
+    }
+
+    public void process(String input) {
+        if (input.equals("test")) {
+            System.out.println("Valid");
+        }
+    }
+
+    public void calcArea(int r) {
+        System.out.println(3.14 * r * r);
+    }
+    public void calcCircumference(int r) {
+        System.out.println(2 * 3.14 * r);
+    }
+
+    public void readFile() {
+        try {
+            FileReader reader = new FileReader("file.txt");
+            int data = reader.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
